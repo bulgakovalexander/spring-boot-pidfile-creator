@@ -1,0 +1,16 @@
+group 'ru.buls'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.projectlombok:lombok:1.16.10"
+    compile "org.springframework.boot:spring-boot:1.4.0.RELEASE"
+    testCompile "junit:junit:4.11"
+}
