@@ -1,6 +1,8 @@
 package ru.buls.springframework.boot;
 
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -8,7 +10,8 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileWriter;
 import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
+
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * Created by Bulgakov Alexander on 06.09.16.
@@ -18,10 +21,11 @@ import java.lang.management.RuntimeMXBean;
  */
 @Component
 @Slf4j
+@FieldDefaults(makeFinal = true, level = PRIVATE)
 public class PidFileCreator implements ApplicationRunner {
     public static final String DEFAULT_FILE_NAME = "application.pid";
-    private final File pidFile;
-    private final boolean exitIfPidExists;
+    File pidFile;
+    boolean exitIfPidExists;
 
     public PidFileCreator() {
         this(true);
@@ -55,13 +59,13 @@ public class PidFileCreator implements ApplicationRunner {
             pid = getPidFromRuntimeMX();
         }
         pidFile.deleteOnExit();
-        final File dir = pidFile.getAbsoluteFile().getParentFile();
-        final String pidFileAbsolutePath = pidFile.getAbsolutePath();
+        val dir = pidFile.getAbsoluteFile().getParentFile();
+        val pidFileAbsolutePath = pidFile.getAbsolutePath();
         if (!dir.canExecute()) {
             final boolean created = dir.mkdirs();
             if (!created) log.error("Cannot create directories for PID file {}", pidFileAbsolutePath);
         }
-        try (FileWriter out = new FileWriter(pidFile)) {
+        try (val out = new FileWriter(pidFile)) {
             out.write(pid);
         } catch (Exception e) {
             log.warn("Cannot create PID file '{}', PID is {}", pidFileAbsolutePath, pid);
@@ -82,8 +86,8 @@ public class PidFileCreator implements ApplicationRunner {
     }
 
     private String getPidFromRuntimeMX() {
-        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-        String name = runtimeMXBean.getName();
+        val runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        val name = runtimeMXBean.getName();
         return name.split("@")[0];
     }
 }
